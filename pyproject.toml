@@ -1,6 +1,6 @@
 [project]
 name = "python-daft-analyser"
-version = "0.1.0"
+version = "1.0.0"
 description = "Independent tool for personal data analysis of Daft.ie property listings"
 readme = "README.md"
 requires-python = ">=3.11"

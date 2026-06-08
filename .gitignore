@@ -1,5 +1,11 @@
 # Runtime scraper outputs (CSV/JSON listings, debug screenshots)
 /data/
+# Defensive: scraper outputs that land in the repo root (e.g. from a manual
+# run without DATA_DIR). Never commit scraped listing data.
+daft_listings_*.csv
+daft_listings_*.json
+rent_cork_city_*.json
+debug_view.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
