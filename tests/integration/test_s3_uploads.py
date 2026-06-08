@@ -1,25 +1,29 @@
-#!/usr/bin/env python3
-"""Tests to verify scraper JSON files were uploaded to S3 and are not empty.
+"""Integration tests verifying scraper JSON files were uploaded to S3.
 
-Integration tests connect to the real S3 bucket using credentials from
-environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET).
+These connect to the real S3 bucket using credentials from environment
+variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET). They are
+marked ``integration`` so they can be deselected in CI:
 
 Usage:
-    # Run all tests
-    pytest test_s3_uploads.py -v
+    # Run only unit tests (skip these)
+    pytest -m "not integration"
 
-    # Run only today's upload verification
-    pytest test_s3_uploads.py -v -k "today"
+    # Run integration tests
+    pytest -m integration -v
 
     # Run with a specific date (YYYYMMDD)
-    S3_CHECK_DATE=20260302 pytest test_s3_uploads.py -v
+    S3_CHECK_DATE=20260302 pytest -m integration -v
 """
 
+import json
 import os
 from datetime import datetime, timezone
 
 import boto3
 import pytest
+
+# Every test in this module hits real AWS S3.
+pytestmark = pytest.mark.integration
 
 S3_BUCKET = os.environ.get("S3_BUCKET")
 S3_CHECK_DATE = os.environ.get("S3_CHECK_DATE", datetime.now(timezone.utc).strftime("%Y%m%d"))
@@ -82,8 +86,6 @@ class TestSaleUploads:
 
     def test_sale_json_content_is_valid(self, s3_client, sale_json_objects):
         """Sale JSON files should contain valid JSON with listing data."""
-        import json
-
         for obj in sale_json_objects:
             response = s3_client.get_object(Bucket=S3_BUCKET, Key=obj["Key"])
             body = response["Body"].read().decode("utf-8")
@@ -119,8 +121,6 @@ class TestRentUploads:
 
     def test_rent_json_content_is_valid(self, s3_client, rent_json_objects):
         """Rent JSON files should contain valid JSON with listing data."""
-        import json
-
         for obj in rent_json_objects:
             response = s3_client.get_object(Bucket=S3_BUCKET, Key=obj["Key"])
             body = response["Body"].read().decode("utf-8")
@@ -131,61 +131,3 @@ class TestRentUploads:
             assert len(data) > 0, (
                 f"Rent file {obj['Key']} has an empty listings array"
             )
-
-
-# ── Unit tests for upload_file() ───────────────────────────────────
-
-
-class TestUploadFileUnit:
-    """Unit tests for the upload_file function (no real S3 needed)."""
-
-    def test_upload_fails_without_s3_bucket(self, monkeypatch):
-        """upload_file should return False when S3_BUCKET is not set."""
-        monkeypatch.delenv("S3_BUCKET", raising=False)
-        from upload_to_s3 import upload_file
-
-        assert upload_file("dummy.json", "sale/") is False
-
-    def test_upload_succeeds_with_mocked_s3(self, monkeypatch, tmp_path):
-        """upload_file should return True when S3 upload succeeds."""
-        monkeypatch.setenv("S3_BUCKET", "test-bucket")
-
-        # Create a temp file to upload
-        test_file = tmp_path / "test.json"
-        test_file.write_text('[{"address": "test"}]')
-
-        from unittest.mock import MagicMock, patch
-
-        mock_client = MagicMock()
-        with patch("upload_to_s3.boto3.client", return_value=mock_client):
-            from upload_to_s3 import upload_file
-
-            result = upload_file(str(test_file), "sale/")
-
-        assert result is True
-        mock_client.upload_file.assert_called_once_with(
-            str(test_file), "test-bucket", "sale/test.json"
-        )
-
-    def test_upload_returns_false_on_client_error(self, monkeypatch, tmp_path):
-        """upload_file should return False when S3 raises a ClientError."""
-        monkeypatch.setenv("S3_BUCKET", "test-bucket")
-
-        test_file = tmp_path / "test.json"
-        test_file.write_text('[{"address": "test"}]')
-
-        from unittest.mock import MagicMock, patch
-
-        from botocore.exceptions import ClientError
-
-        mock_client = MagicMock()
-        mock_client.upload_file.side_effect = ClientError(
-            {"Error": {"Code": "AccessDenied", "Message": "Forbidden"}},
-            "PutObject",
-        )
-        with patch("upload_to_s3.boto3.client", return_value=mock_client):
-            from upload_to_s3 import upload_file
-
-            result = upload_file(str(test_file), "sale/")
-
-        assert result is False
