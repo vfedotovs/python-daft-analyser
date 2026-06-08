@@ -1,8 +1,12 @@
+name: python-daft-analyser
+
 services:
   daft-scraper:
-    build: .
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
     container_name: daft-scraper
-    env_file: .env
+    env_file: ../.env
     environment:
       - TZ=Europe/London
       - LOG_LEVEL=DEBUG

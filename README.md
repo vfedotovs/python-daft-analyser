@@ -33,7 +33,13 @@ After `uv sync` the package also installs console scripts, usable directly:
 | `daft-score`          | `scoring_report.py` |
 | `daft-upload`         | `upload_to_s3.py` |
 
-The Docker image and `run_scrapers.sh` use these console scripts.
+The Docker image and `scripts/run_scrapers.sh` use these console scripts.
+Deployment files live under `deploy/` (`Dockerfile`, `docker-compose.yml`,
+`crontab`); build/run with:
+
+```bash
+docker compose -f deploy/docker-compose.yml up --build
+```
 
 ## Tests
 
@@ -46,7 +52,7 @@ uv run pytest -m integration         # S3 checks (needs AWS creds; else skipped)
 > Without uv? Use a manual venv instead:
 > ```bash
 > python3 -m venv .venv && source .venv/bin/activate
-> pip install -r requirements.txt
+> pip install ".[upload]"        # install the package and its dependencies
 > playwright install chromium
 > ```
 > Then drop the `uv run` prefix from the commands below.
