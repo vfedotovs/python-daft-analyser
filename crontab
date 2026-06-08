@@ -1,0 +1,2 @@
+PATH=/usr/local/bin:/usr/bin:/bin
+0 9 * * * /app/run_scrapers.sh >> /var/log/cron.log 2>&1
