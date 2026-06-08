@@ -1,0 +1,10 @@
+services:
+  daft-scraper:
+    build: .
+    container_name: daft-scraper
+    env_file: .env
+    environment:
+      - TZ=Europe/London
+      - LOG_LEVEL=DEBUG
+    shm_size: "256m"
+    restart: unless-stopped
