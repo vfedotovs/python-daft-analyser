@@ -9,7 +9,7 @@ echo "=========================================="
 
 # Run sale scraper
 echo "[$(date '+%H:%M:%S')] Starting sale scraper..."
-if python3 daft_scraper.py; then
+if daft-scrape-sales; then
     echo "[$(date '+%H:%M:%S')] Sale scraper completed successfully"
 else
     echo "[$(date '+%H:%M:%S')] Sale scraper FAILED"
@@ -17,7 +17,7 @@ fi
 
 # Run rent scraper (30 listings)
 echo "[$(date '+%H:%M:%S')] Starting rent scraper..."
-if python3 daft_rent_scraper.py --max-listings 30; then
+if daft-scrape-rentals --max-listings 30; then
     echo "[$(date '+%H:%M:%S')] Rent scraper completed successfully"
 else
     echo "[$(date '+%H:%M:%S')] Rent scraper FAILED"
@@ -27,7 +27,7 @@ fi
 echo "[$(date '+%H:%M:%S')] Uploading sale files to S3..."
 for f in data/daft_listings_*.csv data/daft_listings_*.json; do
     [ -e "$f" ] || continue
-    if python3 upload_to_s3.py "$f" sale/; then
+    if daft-upload "$f" sale/; then
         echo "[$(date '+%H:%M:%S')] Uploaded $f -> s3://$S3_BUCKET/sale/$(basename "$f")"
         rm "$f"
     else
@@ -39,7 +39,7 @@ done
 echo "[$(date '+%H:%M:%S')] Uploading rent files to S3..."
 for f in data/rent_cork_city_*.json; do
     [ -e "$f" ] || continue
-    if python3 upload_to_s3.py "$f" rent/; then
+    if daft-upload "$f" rent/; then
         echo "[$(date '+%H:%M:%S')] Uploaded $f -> s3://$S3_BUCKET/rent/$(basename "$f")"
         rm "$f"
     else

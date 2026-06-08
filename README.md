@@ -19,9 +19,21 @@ uv run playwright install chromium   # one-time browser download
 Run any script with `uv run python <script.py>`; uv automatically uses the
 project's `.venv`.
 
-The scraping/upload logic lives in the `daft_analyser` package under `src/`;
-the root-level `daft_scraper.py`, `daft_rent_scraper.py`, and `upload_to_s3.py`
-are thin entry-point shims, so the run commands below are unchanged.
+The scraping, scoring, and upload logic lives in the `daft_analyser` package
+under `src/`. The root-level `daft_scraper.py`, `daft_rent_scraper.py`,
+`scoring_report.py`, and `upload_to_s3.py` are thin entry-point shims, so the
+`uv run python <script.py>` commands below are unchanged.
+
+After `uv sync` the package also installs console scripts, usable directly:
+
+| Command | Equivalent script |
+|---------|-------------------|
+| `daft-scrape-sales`   | `daft_scraper.py` |
+| `daft-scrape-rentals` | `daft_rent_scraper.py` |
+| `daft-score`          | `scoring_report.py` |
+| `daft-upload`         | `upload_to_s3.py` |
+
+The Docker image and `run_scrapers.sh` use these console scripts.
 
 ## Tests
 

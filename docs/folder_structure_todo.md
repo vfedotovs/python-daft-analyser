@@ -146,8 +146,8 @@ python-daft-analyser/
 
 These are ordered so each step is independently shippable and testable.
 
-> **Status:** P0 items 1–3 done (branch `refactor/p0-structure`, PR #1).
-> P1 items 4–5 done (branch `refactor/p1-package`). Remaining: P2 (6–7), P3 (8–9).
+> **Status:** P0 items 1–3 (PR #1) and P1 items 4–5 (PR #2) merged to `main`.
+> P2 items 6–7 done (branch `refactor/p2-scoring-cli`). Remaining: P3 (8–9).
 
 - [x] **1. Add `data/` for runtime outputs.** Make the scrapers write to a
   configurable output dir (default `data/`) instead of the repo root; same for
@@ -174,10 +174,10 @@ These are ordered so each step is independently shippable and testable.
   is the highest-value change — it eliminates ~300 lines of duplication. Guard it
   with new offline parser tests (step 3's fixtures) so behavior is preserved.
 
-- [ ] **6. Split `scoring_report.py`** into `scoring/{models,finance,scoring,report}.py`.
+- [x] **6. Split `scoring_report.py`** into `scoring/{models,finance,scoring,report}.py`.
   It's already cleanly sectioned by comment banners, so this is mostly mechanical.
 
-- [ ] **7. Add thin CLI entry points** (or `[project.scripts]` console_scripts in
+- [x] **7. Add thin CLI entry points** (or `[project.scripts]` console_scripts in
   `pyproject.toml`, e.g. `daft-scrape-sales = "daft_analyser.scrapers.sale:main"`).
   Update `run_scrapers.sh` and the Dockerfile `COPY` lines to match the new paths.
 
