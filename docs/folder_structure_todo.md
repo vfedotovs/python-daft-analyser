@@ -146,8 +146,8 @@ python-daft-analyser/
 
 These are ordered so each step is independently shippable and testable.
 
-> **Status:** P0 items 1–3 (PR #1) and P1 items 4–5 (PR #2) merged to `main`.
-> P2 items 6–7 done (branch `refactor/p2-scoring-cli`). Remaining: P3 (8–9).
+> **Status:** ✅ All items done. P0 (PR #1), P1 (PR #2), P2 (PR #3) merged to
+> `main`; P3 items 8–9 on branch `refactor/p3-deploy-deps`. Docker build validated.
 
 - [x] **1. Add `data/` for runtime outputs.** Make the scrapers write to a
   configurable output dir (default `data/`) instead of the repo root; same for
@@ -181,7 +181,7 @@ These are ordered so each step is independently shippable and testable.
   `pyproject.toml`, e.g. `daft-scrape-sales = "daft_analyser.scrapers.sale:main"`).
   Update `run_scrapers.sh` and the Dockerfile `COPY` lines to match the new paths.
 
-- [ ] **8. Move deployment files** into `deploy/` and the orchestration script into
+- [x] **8. Move deployment files** into `deploy/` and the orchestration script into
   `scripts/`. Update `docker-compose.yml` `build:` context and Dockerfile `COPY`
   paths.
 
