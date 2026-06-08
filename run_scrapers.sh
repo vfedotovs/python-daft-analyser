@@ -25,10 +25,10 @@ fi
 
 # Upload sale files to S3
 echo "[$(date '+%H:%M:%S')] Uploading sale files to S3..."
-for f in daft_listings_*.csv daft_listings_*.json; do
+for f in data/daft_listings_*.csv data/daft_listings_*.json; do
     [ -e "$f" ] || continue
     if python3 upload_to_s3.py "$f" sale/; then
-        echo "[$(date '+%H:%M:%S')] Uploaded $f -> s3://$S3_BUCKET/sale/$f"
+        echo "[$(date '+%H:%M:%S')] Uploaded $f -> s3://$S3_BUCKET/sale/$(basename "$f")"
         rm "$f"
     else
         echo "[$(date '+%H:%M:%S')] FAILED to upload $f"
@@ -37,10 +37,10 @@ done
 
 # Upload rent files to S3
 echo "[$(date '+%H:%M:%S')] Uploading rent files to S3..."
-for f in rent_cork_city_*.json; do
+for f in data/rent_cork_city_*.json; do
     [ -e "$f" ] || continue
     if python3 upload_to_s3.py "$f" rent/; then
-        echo "[$(date '+%H:%M:%S')] Uploaded $f -> s3://$S3_BUCKET/rent/$f"
+        echo "[$(date '+%H:%M:%S')] Uploaded $f -> s3://$S3_BUCKET/rent/$(basename "$f")"
         rm "$f"
     else
         echo "[$(date '+%H:%M:%S')] FAILED to upload $f"

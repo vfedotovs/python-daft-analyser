@@ -35,6 +35,13 @@ from playwright.sync_api import sync_playwright, Playwright, Browser, BrowserCon
 from playwright_stealth import Stealth
 
 BASE_URL = "https://www.daft.ie"
+DATA_DIR = os.environ.get("DATA_DIR", "data")
+
+
+def _default_output_path(filename: str) -> str:
+    """Resolve a default output filename inside DATA_DIR, creating the dir."""
+    os.makedirs(DATA_DIR, exist_ok=True)
+    return os.path.join(DATA_DIR, filename)
 
 
 def _detect_platform() -> tuple[str, str]:
@@ -182,8 +189,9 @@ class DaftScraper:
                 logger.debug("Navigation timed out: %s", e)
 
             # Take debug screenshot
-            page.screenshot(path="debug_view.png")
-            logger.debug("Debug screenshot saved as debug_view.png")
+            screenshot_path = _default_output_path("debug_view.png")
+            page.screenshot(path=screenshot_path)
+            logger.debug("Debug screenshot saved as %s", screenshot_path)
 
             self._dismiss_cookies(page)
             self._human_behavior(page)
@@ -519,9 +527,9 @@ def main() -> int:
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     if args.output_csv is None:
-        args.output_csv = f"daft_listings_{timestamp}.csv"
+        args.output_csv = _default_output_path(f"daft_listings_{timestamp}.csv")
     if args.output_json is None:
-        args.output_json = f"daft_listings_{timestamp}.json"
+        args.output_json = _default_output_path(f"daft_listings_{timestamp}.json")
 
     if args.delay_max < args.delay_min:
         logger.error("--delay-max must be >= --delay-min")

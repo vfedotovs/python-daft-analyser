@@ -1,3 +1,6 @@
+# Runtime scraper outputs (CSV/JSON listings, debug screenshots)
+/data/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

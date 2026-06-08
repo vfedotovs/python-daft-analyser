@@ -39,6 +39,13 @@ from playwright.sync_api import sync_playwright, Playwright, Browser, BrowserCon
 from playwright_stealth import Stealth
 
 BASE_URL = "https://www.daft.ie"
+DATA_DIR = os.environ.get("DATA_DIR", "data")
+
+
+def _default_output_path(filename: str) -> str:
+    """Resolve a default output filename inside DATA_DIR, creating the dir."""
+    os.makedirs(DATA_DIR, exist_ok=True)
+    return os.path.join(DATA_DIR, filename)
 
 
 def _detect_platform() -> tuple[str, str]:
@@ -526,7 +533,7 @@ def main() -> int:
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
     if args.output is None:
-        args.output = f"rent_cork_city_{timestamp}.json"
+        args.output = _default_output_path(f"rent_cork_city_{timestamp}.json")
 
     if args.delay_max < args.delay_min:
         logger.error("--delay-max must be >= --delay-min")
