@@ -41,6 +41,19 @@ Deployment files live under `deploy/` (`Dockerfile`, `docker-compose.yml`,
 docker compose -f deploy/docker-compose.yml up --build
 ```
 
+## Make targets
+
+Common tasks are wrapped in a `Makefile` (run `make help` to list them):
+
+| Target | Runs | Purpose |
+|--------|------|---------|
+| `make setup`        | `uv sync` + `playwright install chromium` | Create the venv, install dependencies, download Chromium |
+| `make test`         | `uv run pytest -m "not integration"`      | Run the offline unit test suite |
+| `make docker-build` | `docker compose … build`                  | Build the scraper Docker image |
+| `make docker-run`   | `docker compose … up -d`                  | Start the scraper container (detached; needs a `.env` at repo root) |
+| `make docker-stop`  | `docker compose … down`                   | Stop and remove the scraper container |
+| `make clean`        | remove venv, caches, build artifacts, `data/` | Tear down the environment |
+
 ## Tests
 
 ```bash
