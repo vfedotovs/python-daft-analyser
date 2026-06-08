@@ -12,13 +12,20 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# S3 upload helper (upload_to_s3.py)
+# S3 upload helper (daft_analyser.storage.s3)
 upload = ["boto3>=1.34.0"]
 # Test suite
 test = ["pytest>=8.0.0"]
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/daft_analyser"]
+
 [tool.pytest.ini_options]
-pythonpath = ["."]
+pythonpath = ["src", "."]
 testpaths = ["tests"]
 markers = [
     "integration: tests that hit real AWS S3 (deselect with -m 'not integration')",

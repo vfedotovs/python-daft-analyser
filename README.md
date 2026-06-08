@@ -19,6 +19,18 @@ uv run playwright install chromium   # one-time browser download
 Run any script with `uv run python <script.py>`; uv automatically uses the
 project's `.venv`.
 
+The scraping/upload logic lives in the `daft_analyser` package under `src/`;
+the root-level `daft_scraper.py`, `daft_rent_scraper.py`, and `upload_to_s3.py`
+are thin entry-point shims, so the run commands below are unchanged.
+
+## Tests
+
+```bash
+uv sync --extra test          # install pytest
+uv run pytest -m "not integration"   # fast offline unit tests
+uv run pytest -m integration         # S3 checks (needs AWS creds; else skipped)
+```
+
 > Without uv? Use a manual venv instead:
 > ```bash
 > python3 -m venv .venv && source .venv/bin/activate
