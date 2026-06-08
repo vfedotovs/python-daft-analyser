@@ -91,13 +91,13 @@ class BaseDaftScraper(Generic[R]):
     def _ensure_browser(self) -> None:
         if self._browser is not None:
             return
-        self.logger.debug("Launching Chromium (headless=%s)...", self.headless)
+        self.logger.info("Launching headless Chromium browser...")
         self._pw = sync_playwright().start()
         self._browser = self._pw.chromium.launch(
             headless=self.headless,
             args=self.CHROMIUM_ARGS,
         )
-        self.logger.debug("Chromium launched successfully")
+        self.logger.info("Chromium ready")
         self._context = self._browser.new_context(
             user_agent=self._user_agent,
             viewport=self._viewport(),
@@ -182,6 +182,7 @@ class BaseDaftScraper(Generic[R]):
     def get_listing_urls_from_search(self, search_url: str) -> list[str]:
         """Default HTML-based discovery: fetch the search page and harvest
         listing links via BeautifulSoup + a regex fallback over raw HTML."""
+        self.logger.info("Loading search results page: %s", search_url)
         html = self.fetch_html(search_url)
         self.logger.debug("Search page HTML length: %d chars", len(html))
         soup = BeautifulSoup(html, "html.parser")
@@ -247,6 +248,7 @@ def scrape_search(
     """Discover listing URLs from a search page and scrape each one, with a
     randomised delay between requests. Returns the collected records."""
     logger = scraper.logger
+    logger.info("Discovering listings from search page...")
     urls = scraper.get_listing_urls_from_search(search_url)
 
     if not urls:
@@ -256,10 +258,11 @@ def scrape_search(
     if max_listings and max_listings > 0:
         urls = urls[:max_listings]
 
-    logger.info("Found %d listing URLs", len(urls))
+    logger.info("Found %d listing URLs; scraping each now", len(urls))
 
     records: list[R] = []
     for idx, url in enumerate(urls, start=1):
+        logger.info("[%d/%d] scraping %s", idx, len(urls), url)
         try:
             records.append(scraper.scrape_listing(url))
             logger.info("[%d/%d] OK  %s", idx, len(urls), url)
@@ -267,6 +270,8 @@ def scrape_search(
             logger.error("[%d/%d] ERR %s -> %s", idx, len(urls), url, exc)
 
         if idx < len(urls):
-            time.sleep(random.uniform(delay_min, delay_max))
+            delay = random.uniform(delay_min, delay_max)
+            logger.debug("Sleeping %.1fs before next listing", delay)
+            time.sleep(delay)
 
     return records

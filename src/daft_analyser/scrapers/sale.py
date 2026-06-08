@@ -73,6 +73,7 @@ class DaftScraper(BaseDaftScraper[ListingRecord]):
         return {"width": random.randint(1280, 1440), "height": random.randint(800, 900)}
 
     def get_listing_urls_from_search(self, search_url: str) -> list[str]:
+        self.logger.info("Loading search results page: %s", search_url)
         self._ensure_browser()
         assert self._context is not None
         page = self._context.new_page()

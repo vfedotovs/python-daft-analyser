@@ -5,6 +5,8 @@ FROM python:3.11-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/London
+# Unbuffered stdout/stderr so scraper logs stream live to `docker logs -f`.
+ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     cron \
@@ -46,11 +48,12 @@ RUN uv export --frozen --no-emit-project --extra upload --no-hashes -o /tmp/requ
 RUN playwright install --with-deps chromium
 
 COPY scripts/run_scrapers.sh ./run_scrapers.sh
+COPY scripts/entrypoint.sh ./entrypoint.sh
 COPY deploy/crontab /etc/cron.d/scraper-cron
 
-RUN chmod +x /app/run_scrapers.sh \
+RUN chmod +x /app/run_scrapers.sh /app/entrypoint.sh \
     && chmod 0644 /etc/cron.d/scraper-cron \
     && crontab /etc/cron.d/scraper-cron \
     && touch /var/log/cron.log
 
-CMD /app/run_scrapers.sh >> /var/log/cron.log 2>&1 && cron && tail -f /var/log/cron.log
+CMD ["/app/entrypoint.sh"]
