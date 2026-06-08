@@ -11,7 +11,7 @@ class TestUploadFileUnit:
     def test_upload_fails_without_s3_bucket(self, monkeypatch):
         """upload_file should return False when S3_BUCKET is not set."""
         monkeypatch.delenv("S3_BUCKET", raising=False)
-        from upload_to_s3 import upload_file
+        from daft_analyser.storage.s3 import upload_file
 
         assert upload_file("dummy.json", "sale/") is False
 
@@ -24,8 +24,8 @@ class TestUploadFileUnit:
         test_file.write_text('[{"address": "test"}]')
 
         mock_client = MagicMock()
-        with patch("upload_to_s3.boto3.client", return_value=mock_client):
-            from upload_to_s3 import upload_file
+        with patch("daft_analyser.storage.s3.boto3.client", return_value=mock_client):
+            from daft_analyser.storage.s3 import upload_file
 
             result = upload_file(str(test_file), "sale/")
 
@@ -46,8 +46,8 @@ class TestUploadFileUnit:
             {"Error": {"Code": "AccessDenied", "Message": "Forbidden"}},
             "PutObject",
         )
-        with patch("upload_to_s3.boto3.client", return_value=mock_client):
-            from upload_to_s3 import upload_file
+        with patch("daft_analyser.storage.s3.boto3.client", return_value=mock_client):
+            from daft_analyser.storage.s3 import upload_file
 
             result = upload_file(str(test_file), "sale/")
 

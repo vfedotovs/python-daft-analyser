@@ -146,27 +146,30 @@ python-daft-analyser/
 
 These are ordered so each step is independently shippable and testable.
 
-- [ ] **1. Add `data/` for runtime outputs.** Make the scrapers write to a
+> **Status:** P0 items 1–3 done (branch `refactor/p0-structure`, PR #1).
+> P1 items 4–5 done (branch `refactor/p1-package`). Remaining: P2 (6–7), P3 (8–9).
+
+- [x] **1. Add `data/` for runtime outputs.** Make the scrapers write to a
   configurable output dir (default `data/`) instead of the repo root; same for
   `debug_view.png`. Add `data/` to `.gitignore`. Update `run_scrapers.sh`
   glob paths accordingly. Lowest-risk, immediate cleanup.
 
-- [ ] **2. Declare `boto3` as a real dependency** in `pyproject.toml` (and
+- [x] **2. Declare `boto3` as a real dependency** in `pyproject.toml` (and
   `requirements.txt` if kept) and drop the ad-hoc `pip install ... boto3` from
   the Dockerfile. Consider an optional `[project.optional-dependencies]` group
   (`upload`, `scoring`) so the scraper image stays lean.
 
-- [ ] **3. Create `tests/` with `unit/` and `integration/`.** Move
+- [x] **3. Create `tests/` with `unit/` and `integration/`.** Move
   `test_s3_uploads.py`'s `TestUploadFileUnit` into `tests/unit/` and the
   S3-hitting classes into `tests/integration/`. Register an `integration`
   pytest marker so CI can run `pytest -m "not integration"` by default.
 
-- [ ] **4. Introduce the `daft_analyser` package under `src/`.** Start by moving
+- [x] **4. Introduce the `daft_analyser` package under `src/`.** Start by moving
   `upload_to_s3.py` → `src/daft_analyser/storage/s3.py` (smallest, self-contained)
   and updating the test import. Add `[tool.setuptools]`/`[tool.hatch]` packaging
   config or `[tool.uv]` so `src/` is importable.
 
-- [ ] **5. Extract the shared scraper core** into `scrapers/base.py` and
+- [x] **5. Extract the shared scraper core** into `scrapers/base.py` and
   `scrapers/extract.py`, then refactor both scrapers to subclass/import it. This
   is the highest-value change — it eliminates ~300 lines of duplication. Guard it
   with new offline parser tests (step 3's fixtures) so behavior is preserved.

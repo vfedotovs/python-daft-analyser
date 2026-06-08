@@ -32,6 +32,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 RUN playwright install --with-deps chromium
 
+# Install the daft_analyser package (provides the scraper/upload modules)
+COPY pyproject.toml README.md ./
+COPY src/ ./src/
+RUN pip install --no-cache-dir --no-deps .
+
+# Thin entry-point shims + orchestration invoked by run_scrapers.sh
 COPY daft_scraper.py .
 COPY daft_rent_scraper.py .
 COPY upload_to_s3.py .
